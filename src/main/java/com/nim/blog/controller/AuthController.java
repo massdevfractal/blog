@@ -2,10 +2,12 @@ package com.nim.blog.controller;
 
 import com.nim.blog.entity.Role;
 import com.nim.blog.entity.User;
+import com.nim.blog.payload.JWTAuthResponse;
 import com.nim.blog.payload.LoginDto;
 import com.nim.blog.payload.SignUpDto;
 import com.nim.blog.repository.RoleRepository;
 import com.nim.blog.repository.UserRepository;
+import com.nim.blog.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,13 +22,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
-
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
     @Autowired
     private UserRepository userRepository;
 
@@ -35,17 +37,21 @@ public class AuthController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtTokenProvider tokenProvider;
+
     @PostMapping("/signin")
-    public ResponseEntity<String> authenticateUser(@RequestBody LoginDto loginDto){
+    public ResponseEntity<JWTAuthResponse> authenticateUser(@RequestBody LoginDto loginDto){
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 loginDto.getUsernameOrEmail(), loginDto.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // get token form tokenProvider
-//        String token = tokenProvider.generateToken(authentication);
+        String token = tokenProvider.generateToken(authentication);
 
-        return new ResponseEntity<>("User signed in successfully", HttpStatus.OK);
+        return ResponseEntity.ok(new JWTAuthResponse(token));
     }
 
     @PostMapping("/signup")
