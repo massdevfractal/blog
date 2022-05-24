@@ -4,6 +4,8 @@ import com.nim.blog.payload.PostDto;
 import com.nim.blog.payload.PostResponse;
 import com.nim.blog.service.PostService;
 import com.nim.blog.util.AppConstants;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
+@Api(value = "CRUD Rest APIs for Post resources")
 @RestController
 @RequestMapping("/api/posts")
 public class PostController {
@@ -22,6 +25,7 @@ public class PostController {
         this.postService = postService;
     }
 
+    @ApiOperation(value = "Create Post REST API")
     // create blog post rest api
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
@@ -29,6 +33,7 @@ public class PostController {
         return new ResponseEntity<>(postService.createPost(postDto), HttpStatus.CREATED);
     }
 
+    @ApiOperation(value = "Get All Posts REST API")
     // get all posts rest api
     @GetMapping
     public PostResponse getAllPosts(
